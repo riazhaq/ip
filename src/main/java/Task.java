@@ -11,13 +11,16 @@ public class Task {
         isDone = true;
     }
 
-    public void unmarkDone() {
+    public void markUndone() {
         isDone = false;
+    }
+
+    protected String getStatusIcon() {
+        return isDone ? "X" : " ";
     }
 
     @Override
     public String toString() {
-        return (isDone ? "[X] " : "[ ] ") + description;
+        return "[" + getStatusIcon() + "] " + description;
     }
 }
-
