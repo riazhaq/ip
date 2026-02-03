@@ -2,25 +2,29 @@ import java.util.Scanner;
 
 public class Atlas {
     public static void main(String[] args) {
-        String logo =
-                "  █████╗ ████████╗██╗      █████╗ ███████╗\n"
-                        + " ██╔══██╗╚══██╔══╝██║     ██╔══██╗██╔════╝\n"
-                        + " ███████║   ██║   ██║     ███████║███████╗\n"
-                        + " ██╔══██║   ██║   ██║     ██╔══██║╚════██║\n"
-                        + " ██║  ██║   ██║   ███████╗██║  ██║███████║\n"
-                        + " ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝╚══════╝\n";
+
+
+
 
         System.out.println("Hello! I'm Atlas");
-        System.out.println(logo);
         System.out.println("What can I do for you?");
-        System.out.println("----------------------------------------");
+        System.out.println("--------------------------------------------------");
         System.out.println("Instructions:");
-        System.out.println(" - Type any text to add a task");
-        System.out.println(" - Type 'list' to see all tasks");
-        System.out.println(" - Type 'mark N' to mark task N as done");
-        System.out.println(" - Type 'unmark N' to mark task N as not done");
-        System.out.println(" - Type 'bye' to exit");
-        System.out.println("----------------------------------------");
+        System.out.println("  Add a todo task:");
+        System.out.println("    todo <description>");
+        System.out.println();
+        System.out.println("  Add a deadline:");
+        System.out.println("    deadline <description> /by <date>");
+        System.out.println();
+        System.out.println("  Add an event:");
+        System.out.println("    event <description> /from <start> /to <end>");
+        System.out.println();
+        System.out.println("  Other commands:");
+        System.out.println("    list            → show all tasks");
+        System.out.println("    mark N          → mark task N as done");
+        System.out.println("    unmark N        → mark task N as not done");
+        System.out.println("    bye             → exit Atlas");
+        System.out.println("--------------------------------------------------");
 
         Scanner scanner = new Scanner(System.in);
 
@@ -52,13 +56,39 @@ public class Atlas {
                 System.out.println("OK, I've marked this task as not done yet:");
                 System.out.println(tasks[index]);
 
-            } else {
-                tasks[count] = new Task(input);
-                System.out.println("added: " + input);
+            } else if (input.startsWith("todo ")) {
+                String description = input.substring(5);
+                tasks[count] = new Todo(description);
                 count++;
+                System.out.println("Got it. I've added this task:");
+                System.out.println(tasks[count - 1]);
+                System.out.println("Now you have " + count + " tasks in the list.");
+
+            } else if (input.startsWith("deadline ")) {
+                String[] parts = input.substring(9).split(" /by ", 2);
+                String description = parts[0];
+                String by = parts[1];
+                tasks[count] = new Deadline(description, by);
+                count++;
+                System.out.println("Got it. I've added this task:");
+                System.out.println(tasks[count - 1]);
+                System.out.println("Now you have " + count + " tasks in the list.");
+
+            } else if (input.startsWith("event ")) {
+                String[] parts = input.substring(6).split(" /from ", 2);
+                String description = parts[0];
+                String[] timeParts = parts[1].split(" /to ", 2);
+                String from = timeParts[0];
+                String to = timeParts[1];
+                tasks[count] = new Event(description, from, to);
+                count++;
+                System.out.println("Got it. I've added this task:");
+                System.out.println(tasks[count - 1]);
+                System.out.println("Now you have " + count + " tasks in the list.");
+
+            } else {
+                System.out.println("Sorry, I don't understand that command.");
             }
         }
     }
 }
-
-
