@@ -5,7 +5,16 @@ public class Atlas {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Task> tasks = new ArrayList<>();
+        Storage storage = new Storage("./data/atlas.txt");
+        ArrayList<Task> tasks;
+
+        // Load tasks on startup
+        try {
+            tasks = storage.load();
+        } catch (AtlasException e) {
+            System.out.println("Starting with an empty task list.");
+            tasks = new ArrayList<>();
+        }
 
         System.out.println("Hello! I'm Atlas.");
         System.out.println("What can I do for you?");
@@ -36,6 +45,8 @@ public class Atlas {
                     }
                     String description = input.substring(5);
                     tasks.add(new Todo(description));
+                    storage.save(tasks);
+
                     System.out.println("Got it. I've added this task:");
                     System.out.println("  " + tasks.get(tasks.size() - 1));
                 }
@@ -49,6 +60,8 @@ public class Atlas {
                         throw new AtlasException("Deadline description cannot be empty.");
                     }
                     tasks.add(new Deadline(parts[0].trim(), parts[1].trim()));
+                    storage.save(tasks);
+
                     System.out.println("Got it. I've added this task:");
                     System.out.println("  " + tasks.get(tasks.size() - 1));
                 }
@@ -66,6 +79,8 @@ public class Atlas {
                             parts[1].trim(),
                             parts[2].trim()
                     ));
+                    storage.save(tasks);
+
                     System.out.println("Got it. I've added this task:");
                     System.out.println("  " + tasks.get(tasks.size() - 1));
                 }
@@ -77,6 +92,8 @@ public class Atlas {
                             throw new AtlasException("That task number does not exist.");
                         }
                         tasks.get(index).markDone();
+                        storage.save(tasks);
+
                         System.out.println("Nice! I've marked this task as done:");
                         System.out.println("  " + tasks.get(index));
                     } catch (NumberFormatException e) {
@@ -91,6 +108,8 @@ public class Atlas {
                             throw new AtlasException("That task number does not exist.");
                         }
                         tasks.get(index).markUndone();
+                        storage.save(tasks);
+
                         System.out.println("OK, I've marked this task as not done yet:");
                         System.out.println("  " + tasks.get(index));
                     } catch (NumberFormatException e) {
@@ -105,6 +124,8 @@ public class Atlas {
                             throw new AtlasException("That task number does not exist.");
                         }
                         Task removedTask = tasks.remove(index);
+                        storage.save(tasks);
+
                         System.out.println("Noted. I've removed this task:");
                         System.out.println("  " + removedTask);
                         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
