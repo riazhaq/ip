@@ -1,12 +1,11 @@
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Atlas {
-    private static final int MAX_TASKS = 100;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         System.out.println("Hello! I'm Atlas.");
         System.out.println("What can I do for you?");
@@ -21,12 +20,13 @@ public class Atlas {
                 }
 
                 else if (input.equals("list")) {
-                    if (taskCount == 0) {
+                    if (tasks.isEmpty()) {
                         System.out.println("Your task list is empty.");
                         continue;
                     }
-                    for (int i = 0; i < taskCount; i++) {
-                        System.out.println((i + 1) + ". " + tasks[i]);
+                    System.out.println("Here are the tasks in your list:");
+                    for (int i = 0; i < tasks.size(); i++) {
+                        System.out.println((i + 1) + ". " + tasks.get(i));
                     }
                 }
 
@@ -35,9 +35,9 @@ public class Atlas {
                         throw new AtlasException("A todo needs a description.");
                     }
                     String description = input.substring(5);
-                    tasks[taskCount++] = new Todo(description);
+                    tasks.add(new Todo(description));
                     System.out.println("Got it. I've added this task:");
-                    System.out.println(tasks[taskCount - 1]);
+                    System.out.println("  " + tasks.get(tasks.size() - 1));
                 }
 
                 else if (input.startsWith("deadline")) {
@@ -48,9 +48,9 @@ public class Atlas {
                     if (parts[0].trim().isEmpty()) {
                         throw new AtlasException("Deadline description cannot be empty.");
                     }
-                    tasks[taskCount++] = new Deadline(parts[0].trim(), parts[1].trim());
+                    tasks.add(new Deadline(parts[0].trim(), parts[1].trim()));
                     System.out.println("Got it. I've added this task:");
-                    System.out.println(tasks[taskCount - 1]);
+                    System.out.println("  " + tasks.get(tasks.size() - 1));
                 }
 
                 else if (input.startsWith("event")) {
@@ -61,24 +61,24 @@ public class Atlas {
                     if (parts[0].trim().isEmpty()) {
                         throw new AtlasException("Event description cannot be empty.");
                     }
-                    tasks[taskCount++] = new Event(
+                    tasks.add(new Event(
                             parts[0].trim(),
                             parts[1].trim(),
                             parts[2].trim()
-                    );
+                    ));
                     System.out.println("Got it. I've added this task:");
-                    System.out.println(tasks[taskCount - 1]);
+                    System.out.println("  " + tasks.get(tasks.size() - 1));
                 }
 
                 else if (input.startsWith("mark")) {
                     try {
                         int index = Integer.parseInt(input.substring(5)) - 1;
-                        if (index < 0 || index >= taskCount) {
+                        if (index < 0 || index >= tasks.size()) {
                             throw new AtlasException("That task number does not exist.");
                         }
-                        tasks[index].markDone();
+                        tasks.get(index).markDone();
                         System.out.println("Nice! I've marked this task as done:");
-                        System.out.println(tasks[index]);
+                        System.out.println("  " + tasks.get(index));
                     } catch (NumberFormatException e) {
                         throw new AtlasException("Please provide a valid task number.");
                     }
@@ -87,14 +87,29 @@ public class Atlas {
                 else if (input.startsWith("unmark")) {
                     try {
                         int index = Integer.parseInt(input.substring(7)) - 1;
-                        if (index < 0 || index >= taskCount) {
+                        if (index < 0 || index >= tasks.size()) {
                             throw new AtlasException("That task number does not exist.");
                         }
-                        tasks[index].markUndone();
+                        tasks.get(index).markUndone();
                         System.out.println("OK, I've marked this task as not done yet:");
-                        System.out.println(tasks[index]);
+                        System.out.println("  " + tasks.get(index));
                     } catch (NumberFormatException e) {
                         throw new AtlasException("Please provide a valid task number.");
+                    }
+                }
+
+                else if (input.startsWith("delete")) {
+                    try {
+                        int index = Integer.parseInt(input.substring(7)) - 1;
+                        if (index < 0 || index >= tasks.size()) {
+                            throw new AtlasException("That task number does not exist.");
+                        }
+                        Task removedTask = tasks.remove(index);
+                        System.out.println("Noted. I've removed this task:");
+                        System.out.println("  " + removedTask);
+                        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                    } catch (NumberFormatException e) {
+                        throw new AtlasException("Please provide a valid task number to delete.");
                     }
                 }
 
