@@ -16,17 +16,27 @@ public class Atlas {
 
         Scanner scanner = new Scanner(System.in);
 
+        String[] items = new String[100];
+        int count = 0;
+
         while (true) {
             String input = scanner.nextLine();
 
             if (input.equals("bye")) {
                 System.out.println("Bye. Hope to see you again soon!");
                 break;
+            } else if (input.equals("list")) {
+                for (int i = 0; i < count; i++) {
+                    System.out.println((i + 1) + ". " + items[i]);
+                }
+            } else {
+                items[count] = input;
+                count++;
+                System.out.println("added: " + input);
             }
-
-            System.out.println(input);
         }
     }
 }
+
 
 
