@@ -1,44 +1,40 @@
-import java.util.Scanner;
-import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-
 
 public class Atlas {
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Ui ui = new Ui();
         Storage storage = new Storage("./data/atlas.txt");
-        ArrayList<Task> tasks;
+        TaskList tasks;
 
         // Load tasks on startup
         try {
-            tasks = storage.load();
+            tasks = new TaskList(storage.load());
         } catch (AtlasException e) {
-            System.out.println("Starting with an empty task list.");
-            tasks = new ArrayList<>();
+            ui.showMessage("Starting with an empty task list.");
+            tasks = new TaskList();
         }
 
-        System.out.println("Hello! I'm Atlas.");
-        System.out.println("What can I do for you?");
+        ui.showWelcome();
 
         while (true) {
             try {
-                String input = scanner.nextLine().trim();
+                String input = ui.readCommand();
 
                 if (input.equals("bye")) {
-                    System.out.println("Bye. Hope to see you again soon!");
+                    ui.showGoodbye();
                     break;
                 }
 
                 else if (input.equals("list")) {
                     if (tasks.isEmpty()) {
-                        System.out.println("Your task list is empty.");
+                        ui.showMessage("Your task list is empty.");
                         continue;
                     }
-                    System.out.println("Here are the tasks in your list:");
+                    ui.showMessage("Here are the tasks in your list:");
                     for (int i = 0; i < tasks.size(); i++) {
-                        System.out.println((i + 1) + ". " + tasks.get(i));
+                        ui.showMessage((i + 1) + ". " + tasks.get(i));
                     }
                 }
 
@@ -48,10 +44,10 @@ public class Atlas {
                     }
                     String description = input.substring(5);
                     tasks.add(new Todo(description));
-                    storage.save(tasks);
+                    storage.save(tasks.getAll());
 
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + tasks.get(tasks.size() - 1));
+                    ui.showMessage("Got it. I've added this task:");
+                    ui.showMessage("  " + tasks.get(tasks.size() - 1));
                 }
 
                 else if (input.startsWith("deadline")) {
@@ -67,15 +63,14 @@ public class Atlas {
                     try {
                         LocalDate by = LocalDate.parse(parts[1].trim());
                         tasks.add(new Deadline(parts[0].trim(), by));
-                        storage.save(tasks);
+                        storage.save(tasks.getAll());
 
-                        System.out.println("Got it. I've added this task:");
-                        System.out.println("  " + tasks.get(tasks.size() - 1));
+                        ui.showMessage("Got it. I've added this task:");
+                        ui.showMessage("  " + tasks.get(tasks.size() - 1));
                     } catch (DateTimeParseException e) {
                         throw new AtlasException("Please use date format yyyy-mm-dd.");
                     }
                 }
-
 
                 else if (input.startsWith("event")) {
                     if (!input.contains("/from") || !input.contains("/to")) {
@@ -92,15 +87,14 @@ public class Atlas {
                         LocalDate to = LocalDate.parse(parts[2].trim());
 
                         tasks.add(new Event(parts[0].trim(), from, to));
-                        storage.save(tasks);
+                        storage.save(tasks.getAll());
 
-                        System.out.println("Got it. I've added this task:");
-                        System.out.println("  " + tasks.get(tasks.size() - 1));
+                        ui.showMessage("Got it. I've added this task:");
+                        ui.showMessage("  " + tasks.get(tasks.size() - 1));
                     } catch (DateTimeParseException e) {
                         throw new AtlasException("Please use date format yyyy-mm-dd.");
                     }
                 }
-
 
                 else if (input.startsWith("mark")) {
                     try {
@@ -109,10 +103,10 @@ public class Atlas {
                             throw new AtlasException("That task number does not exist.");
                         }
                         tasks.get(index).markDone();
-                        storage.save(tasks);
+                        storage.save(tasks.getAll());
 
-                        System.out.println("Nice! I've marked this task as done:");
-                        System.out.println("  " + tasks.get(index));
+                        ui.showMessage("Nice! I've marked this task as done:");
+                        ui.showMessage("  " + tasks.get(index));
                     } catch (NumberFormatException e) {
                         throw new AtlasException("Please provide a valid task number.");
                     }
@@ -125,10 +119,10 @@ public class Atlas {
                             throw new AtlasException("That task number does not exist.");
                         }
                         tasks.get(index).markUndone();
-                        storage.save(tasks);
+                        storage.save(tasks.getAll());
 
-                        System.out.println("OK, I've marked this task as not done yet:");
-                        System.out.println("  " + tasks.get(index));
+                        ui.showMessage("OK, I've marked this task as not done yet:");
+                        ui.showMessage("  " + tasks.get(index));
                     } catch (NumberFormatException e) {
                         throw new AtlasException("Please provide a valid task number.");
                     }
@@ -140,12 +134,13 @@ public class Atlas {
                         if (index < 0 || index >= tasks.size()) {
                             throw new AtlasException("That task number does not exist.");
                         }
-                        Task removedTask = tasks.remove(index);
-                        storage.save(tasks);
 
-                        System.out.println("Noted. I've removed this task:");
-                        System.out.println("  " + removedTask);
-                        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                        Task removedTask = tasks.remove(index);
+                        storage.save(tasks.getAll());
+
+                        ui.showMessage("Noted. I've removed this task:");
+                        ui.showMessage("  " + removedTask);
+                        ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
                     } catch (NumberFormatException e) {
                         throw new AtlasException("Please provide a valid task number to delete.");
                     }
@@ -156,12 +151,8 @@ public class Atlas {
                 }
 
             } catch (AtlasException e) {
-                System.out.println("--------------------------------------------------");
-                System.out.println("Oops! " + e.getMessage());
-                System.out.println("--------------------------------------------------");
+                ui.showError(e.getMessage());
             }
         }
-
-        scanner.close();
     }
 }
