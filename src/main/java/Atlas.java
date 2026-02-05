@@ -1,5 +1,8 @@
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 
 public class Atlas {
 
@@ -53,37 +56,51 @@ public class Atlas {
 
                 else if (input.startsWith("deadline")) {
                     if (!input.contains("/by")) {
-                        throw new AtlasException("A deadline needs a /by time.");
+                        throw new AtlasException("A deadline needs a /by date.");
                     }
+
                     String[] parts = input.substring(9).split("/by", 2);
                     if (parts[0].trim().isEmpty()) {
                         throw new AtlasException("Deadline description cannot be empty.");
                     }
-                    tasks.add(new Deadline(parts[0].trim(), parts[1].trim()));
-                    storage.save(tasks);
 
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + tasks.get(tasks.size() - 1));
+                    try {
+                        LocalDate by = LocalDate.parse(parts[1].trim());
+                        tasks.add(new Deadline(parts[0].trim(), by));
+                        storage.save(tasks);
+
+                        System.out.println("Got it. I've added this task:");
+                        System.out.println("  " + tasks.get(tasks.size() - 1));
+                    } catch (DateTimeParseException e) {
+                        throw new AtlasException("Please use date format yyyy-mm-dd.");
+                    }
                 }
+
 
                 else if (input.startsWith("event")) {
                     if (!input.contains("/from") || !input.contains("/to")) {
-                        throw new AtlasException("An event needs /from and /to.");
+                        throw new AtlasException("An event needs /from and /to dates.");
                     }
+
                     String[] parts = input.substring(6).split("/from|/to");
                     if (parts[0].trim().isEmpty()) {
                         throw new AtlasException("Event description cannot be empty.");
                     }
-                    tasks.add(new Event(
-                            parts[0].trim(),
-                            parts[1].trim(),
-                            parts[2].trim()
-                    ));
-                    storage.save(tasks);
 
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println("  " + tasks.get(tasks.size() - 1));
+                    try {
+                        LocalDate from = LocalDate.parse(parts[1].trim());
+                        LocalDate to = LocalDate.parse(parts[2].trim());
+
+                        tasks.add(new Event(parts[0].trim(), from, to));
+                        storage.save(tasks);
+
+                        System.out.println("Got it. I've added this task:");
+                        System.out.println("  " + tasks.get(tasks.size() - 1));
+                    } catch (DateTimeParseException e) {
+                        throw new AtlasException("Please use date format yyyy-mm-dd.");
+                    }
                 }
+
 
                 else if (input.startsWith("mark")) {
                     try {
