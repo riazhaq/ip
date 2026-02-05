@@ -1,3 +1,5 @@
+package atlas;
+
 import java.time.LocalDate;
 
 public class ParsedCommand {
