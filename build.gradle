@@ -28,8 +28,9 @@ test {
 }
 
 application {
-    mainClass.set("seedu.duke.Duke")
+    mainClass = 'atlas.Atlas'
 }
+
 
 shadowJar {
     archiveBaseName = "duke"
