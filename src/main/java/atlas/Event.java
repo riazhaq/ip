@@ -2,6 +2,9 @@ package atlas;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Represents a task that occurs over a time period.
+ */
 public class Event extends Task {
     private LocalDate from;
     private LocalDate to;

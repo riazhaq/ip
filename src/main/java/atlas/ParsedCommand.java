@@ -2,6 +2,9 @@ package atlas;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a parsed user command with its type and arguments.
+ */
 public class ParsedCommand {
     public final CommandType type;
     public final String description;

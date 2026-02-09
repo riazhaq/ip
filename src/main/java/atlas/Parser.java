@@ -3,8 +3,18 @@ package atlas;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Parses raw user input into structured commands.
+ */
 public class Parser {
 
+    /**
+     * Parses the user input into a {@code ParsedCommand}.
+     *
+     * @param input the raw user input
+     * @return a parsed representation of the command
+     * @throws AtlasException if the command is invalid
+     */
     public static ParsedCommand parse(String input) throws AtlasException {
         input = input.trim();
 

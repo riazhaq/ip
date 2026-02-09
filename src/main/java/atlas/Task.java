@@ -1,6 +1,13 @@
 package atlas;
 
+/**
+ * Represents a task managed by the Atlas chatbot.
+ */
 public class Task {
+
+    /**
+     * Marks this task as completed.
+     */
     protected String description;
     protected boolean isDone;
 

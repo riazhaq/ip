@@ -1,5 +1,8 @@
 package atlas;
 
+/**
+ * Represents the different types of commands supported by Atlas.
+ */
 public enum CommandType {
     BYE,
     LIST,

@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+/**
+ * Handles loading and saving tasks to persistent storage.
+ */
 public class Storage {
 
     private final String filePath;

@@ -2,6 +2,10 @@ package atlas;
 
 import java.util.ArrayList;
 
+/**
+ * Manages a collection of tasks.
+ * Provides operations to add, remove, and retrieve tasks.
+ */
 public class TaskList {
     private final ArrayList<Task> tasks;
 

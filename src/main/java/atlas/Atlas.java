@@ -1,6 +1,9 @@
 package atlas;
 
-
+/**
+ * The main entry point of the Atlas chatbot application.
+ * Coordinates user interaction, command parsing, and task management.
+ */
 public class Atlas {
 
     public static void main(String[] args) {
