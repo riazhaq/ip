@@ -1,88 +1,60 @@
 package atlas;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-
-/**
- * Parses raw user input into structured commands.
- */
 public class Parser {
 
-    /**
-     * Parses the user input into a {@code ParsedCommand}.
-     *
-     * @param input the raw user input
-     * @return a parsed representation of the command
-     * @throws AtlasException if the command is invalid
-     */
     public static ParsedCommand parse(String input) throws AtlasException {
-        input = input.trim();
+        String trimmed = input.trim();
 
-        if (input.equals("bye")) {
-            return new ParsedCommand(CommandType.BYE);
-        }
-
-        if (input.equals("list")) {
+        if (trimmed.equals("list")) {
             return new ParsedCommand(CommandType.LIST);
         }
 
-        if (input.startsWith("todo")) {
-            if (input.length() <= 4) {
-                throw new AtlasException("A todo needs a description.");
-            }
-            return new ParsedCommand(CommandType.TODO, input.substring(5));
+        if (trimmed.equals("exit")) {
+            return new ParsedCommand(CommandType.EXIT);
         }
 
-        if (input.startsWith("deadline")) {
-            if (!input.contains("/by")) {
-                throw new AtlasException("A deadline needs a /by date.");
+        if (trimmed.startsWith("find")) {
+            String keyword = trimmed.substring(4).trim();
+            if (keyword.isEmpty()) {
+                throw new AtlasException("Please provide a keyword to search for.");
             }
-
-            String[] parts = input.substring(9).split("/by", 2);
-            if (parts[0].trim().isEmpty()) {
-                throw new AtlasException("Deadline description cannot be empty.");
-            }
-
-            try {
-                LocalDate by = LocalDate.parse(parts[1].trim());
-                return new ParsedCommand(CommandType.DEADLINE, parts[0].trim(), by);
-            } catch (DateTimeParseException e) {
-                throw new AtlasException("Please use date format yyyy-mm-dd.");
-            }
+            return new ParsedCommand(CommandType.FIND, keyword);
         }
 
-        if (input.startsWith("event")) {
-            if (!input.contains("/from") || !input.contains("/to")) {
-                throw new AtlasException("An event needs /from and /to dates.");
+        if (trimmed.startsWith("mark")) {
+            int index = parseIndex(trimmed, 4);
+            return new ParsedCommand(CommandType.MARK, index);
+        }
+
+        if (trimmed.startsWith("unmark")) {
+            int index = parseIndex(trimmed, 6);
+            return new ParsedCommand(CommandType.UNMARK, index);
+        }
+
+        if (trimmed.startsWith("delete")) {
+            int index = parseIndex(trimmed, 6);
+            return new ParsedCommand(CommandType.DELETE, index);
+        }
+
+        if (trimmed.startsWith("todo")) {
+            String description = trimmed.substring(4).trim();
+            if (description.isEmpty()) {
+                throw new AtlasException("The description of a todo cannot be empty.");
             }
-
-            String[] parts = input.substring(6).split("/from|/to");
-            if (parts[0].trim().isEmpty()) {
-                throw new AtlasException("Event description cannot be empty.");
-            }
-
-            try {
-                LocalDate from = LocalDate.parse(parts[1].trim());
-                LocalDate to = LocalDate.parse(parts[2].trim());
-                return new ParsedCommand(CommandType.EVENT, parts[0].trim(), from, to);
-            } catch (DateTimeParseException e) {
-                throw new AtlasException("Please use date format yyyy-mm-dd.");
-            }
+            return new ParsedCommand(CommandType.TODO, description);
         }
 
-        if (input.startsWith("mark")) {
-            return new ParsedCommand(CommandType.MARK, parseIndex(input, 5));
+        if (trimmed.startsWith("deadline")) {
+            String details = trimmed.substring(8).trim();
+            return new ParsedCommand(CommandType.DEADLINE, details);
         }
 
-        if (input.startsWith("unmark")) {
-            return new ParsedCommand(CommandType.UNMARK, parseIndex(input, 7));
+        if (trimmed.startsWith("event")) {
+            String details = trimmed.substring(5).trim();
+            return new ParsedCommand(CommandType.EVENT, details);
         }
 
-        if (input.startsWith("delete")) {
-            return new ParsedCommand(CommandType.DELETE, parseIndex(input, 7));
-        }
-
-        throw new AtlasException("I don't know what that command means.");
+        throw new AtlasException("I'm sorry, but I don't know what that means.");
     }
 
     private static int parseIndex(String input, int start) throws AtlasException {
@@ -93,4 +65,3 @@ public class Parser {
         }
     }
 }
-

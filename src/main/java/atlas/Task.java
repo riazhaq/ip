@@ -1,19 +1,16 @@
 package atlas;
 
-/**
- * Represents a task managed by the Atlas chatbot.
- */
-public class Task {
-
-    /**
-     * Marks this task as completed.
-     */
+public abstract class Task {
     protected String description;
     protected boolean isDone;
 
     public Task(String description) {
         this.description = description;
         this.isDone = false;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public void markDone() {
@@ -24,12 +21,8 @@ public class Task {
         isDone = false;
     }
 
-    protected String getStatusIcon() {
-        return isDone ? "X" : " ";
-    }
-
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        return "[" + (isDone ? "X" : " ") + "] " + description;
     }
 }

@@ -1,89 +1,82 @@
 package atlas;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.time.LocalDate;
 
-/**
- * The main entry point of the Atlas chatbot application.
- * Coordinates user interaction, command parsing, and task management.
- */
+
 public class Atlas {
 
-    public static void main(String[] args) {
-        Ui ui = new Ui();
-        Storage storage = new Storage("./data/atlas.txt");
-        TaskList tasks;
+    private final TaskList tasks;
+    private final Storage storage;
+    private final Ui ui;
 
-        try {
-            tasks = new TaskList(storage.load());
-        } catch (AtlasException e) {
-            ui.showMessage("Starting with an empty task list.");
-            tasks = new TaskList();
-        }
+    public Atlas() {
+        ui = new Ui();
+        storage = new Storage("data/atlas.txt");
+        tasks = new TaskList();
+    }
 
-        ui.showWelcome();
-
+    public void run() {
+        Scanner scanner = new Scanner(System.in);
         boolean isExit = false;
 
         while (!isExit) {
             try {
-                ParsedCommand command = Parser.parse(ui.readCommand());
+                String input = scanner.nextLine();
+                ParsedCommand command = Parser.parse(input);
 
-                switch (command.type) {
+                switch (command.getCommandType()) {
 
-                    case BYE:
-                        ui.showGoodbye();
+                    case TODO: {
+                        Task todo = new Todo(command.getArgument());
+                        tasks.add(todo);
+                        ui.showTaskAdded(todo, tasks.size());
+                        break;
+                    }
+
+                    case DEADLINE: {
+                        String[] parts = command.getArgument().split("/by");
+                        String description = parts[0].trim();
+                        LocalDate by = LocalDate.parse(parts[1].trim());
+
+                        Task deadline = new Deadline(description, by);
+                        tasks.add(deadline);
+                        ui.showTaskAdded(deadline, tasks.size());
+                        break;
+                    }
+
+
+                    case EVENT: {
+                        String[] parts = command.getArgument().split("/from|/to");
+                        String description = parts[0].trim();
+                        LocalDate from = LocalDate.parse(parts[1].trim());
+                        LocalDate to = LocalDate.parse(parts[2].trim());
+
+                        Task event = new Event(description, from, to);
+                        tasks.add(event);
+                        ui.showTaskAdded(event, tasks.size());
+                        break;
+                    }
+
+
+
+                    case LIST:
+                        ui.showTaskList(tasks.getTasks());
+                        break;
+
+                    case CommandType.FIND:
+
+                        ArrayList<Task> foundTasks =
+                                tasks.findTasks(command.getArgument());
+                        ui.showFoundTasks(foundTasks);
+                        break;
+
+                    case CommandType.EXIT:
                         isExit = true;
                         break;
 
-                    case LIST:
-                        if (tasks.isEmpty()) {
-                            ui.showMessage("Your task list is empty.");
-                            break;
-                        }
-                        ui.showMessage("Here are the tasks in your list:");
-                        for (int i = 0; i < tasks.size(); i++) {
-                            ui.showMessage((i + 1) + ". " + tasks.get(i));
-                        }
-                        break;
-
-                    case TODO:
-                        tasks.add(new Todo(command.description));
-                        storage.save(tasks.getAll());
-                        ui.showMessage("Got it. I've added this task:");
-                        ui.showMessage("  " + tasks.get(tasks.size() - 1));
-                        break;
-
-                    case DEADLINE:
-                        tasks.add(new Deadline(command.description, command.date1));
-                        storage.save(tasks.getAll());
-                        ui.showMessage("Got it. I've added this task:");
-                        ui.showMessage("  " + tasks.get(tasks.size() - 1));
-                        break;
-
-                    case EVENT:
-                        tasks.add(new Event(command.description, command.date1, command.date2));
-                        storage.save(tasks.getAll());
-                        ui.showMessage("Got it. I've added this task:");
-                        ui.showMessage("  " + tasks.get(tasks.size() - 1));
-                        break;
-
-                    case MARK:
-                        tasks.get(command.index).markDone();
-                        storage.save(tasks.getAll());
-                        ui.showMessage("Nice! I've marked this task as done:");
-                        ui.showMessage("  " + tasks.get(command.index));
-                        break;
-
-                    case UNMARK:
-                        tasks.get(command.index).markUndone();
-                        storage.save(tasks.getAll());
-                        ui.showMessage("OK, I've marked this task as not done yet:");
-                        ui.showMessage("  " + tasks.get(command.index));
-                        break;
-
-                    case DELETE:
-                        ui.showMessage("Noted. I've removed this task:");
-                        ui.showMessage("  " + tasks.remove(command.index));
-                        storage.save(tasks.getAll());
-                        ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
+                    // other cases (todo, deadline, mark, etc.)
+                    default:
                         break;
                 }
 
@@ -91,5 +84,9 @@ public class Atlas {
                 ui.showError(e.getMessage());
             }
         }
+    }
+
+    public static void main(String[] args) {
+        new Atlas().run();
     }
 }

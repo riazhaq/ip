@@ -1,5 +1,5 @@
 package atlas;
-
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -7,46 +7,46 @@ import java.util.Scanner;
  * Responsible for displaying messages and reading user input.
  */
 public class Ui {
-    private final Scanner scanner = new Scanner(System.in);
 
-    /**
-     * Displays the welcome message.
-     */
-    public void showWelcome() {
-        System.out.println("Hello! I'm Atlas.");
-        System.out.println("What can I do for you?");
+    public static void printLine() {
+        System.out.println("____________________________________________________________");
     }
 
-    /**
-     * Reads a command entered by the user.
-     *
-     * @return the full command string entered by the user
-     */
-    public String readCommand() {
-        return scanner.nextLine().trim();
+    public static void showTaskList(ArrayList<Task> tasks) {
+        printLine();
+        System.out.println("Here are the tasks in your list:");
+
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println((i + 1) + "." + tasks.get(i));
+        }
+
+        printLine();
     }
 
-    public void showLine() {
-        System.out.println("--------------------------------------------------");
+    public void showTaskAdded(Task task, int size) {
+        printLine();
+        System.out.println("Got it. I've added this task:");
+        System.out.println("  " + task);
+        System.out.println("Now you have " + size + " tasks in the list.");
+        printLine();
     }
 
-    public void showMessage(String message) {
+
+    public static void showFoundTasks(ArrayList<Task> tasks) {
+        printLine();
+        System.out.println("Here are the matching tasks in your list:");
+
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println((i + 1) + "." + tasks.get(i));
+        }
+
+        printLine();
+    }
+
+    public static void showError(String message) {
+        printLine();
         System.out.println(message);
-    }
-
-    /**
-     * Displays an error message.
-     *
-     * @param message the error message to display
-     */
-    public void showError(String message) {
-        showLine();
-        System.out.println("Oops! " + message);
-        showLine();
-    }
-
-    public void showGoodbye() {
-        System.out.println("Bye. Hope to see you again soon!");
+        printLine();
     }
 }
 
