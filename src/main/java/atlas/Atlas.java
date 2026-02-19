@@ -64,14 +64,14 @@ public class Atlas {
                         ui.showTaskList(tasks.getTasks());
                         break;
 
-                    case CommandType.FIND:
+                    case FIND:
 
                         ArrayList<Task> foundTasks =
                                 tasks.findTasks(command.getArgument());
                         ui.showFoundTasks(foundTasks);
                         break;
 
-                    case CommandType.EXIT:
+                    case EXIT:
                         isExit = true;
                         break;
 
