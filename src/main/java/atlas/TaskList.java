@@ -3,38 +3,61 @@ package atlas;
 import java.util.ArrayList;
 
 public class TaskList {
-    private final ArrayList<Task> tasks;
+
+    private ArrayList<Task> tasks;
 
     public TaskList() {
-        tasks = new ArrayList<>();
+        this.tasks = new ArrayList<>();
     }
 
-    // ✅ ADD THIS
-    public void add(Task task) {
-        tasks.add(task);
+    public void setTasks(ArrayList<Task> tasks) {
+        this.tasks = tasks;
     }
 
-    // ✅ ADD THIS
-    public int size() {
-        return tasks.size();
-    }
-
-    // Already used by list
     public ArrayList<Task> getTasks() {
         return tasks;
     }
 
-    // Level 9: find
-    public ArrayList<Task> findTasks(String keyword) {
-        ArrayList<Task> results = new ArrayList<>();
-        String lowerKeyword = keyword.toLowerCase();
+    public void add(Task task) {
+        tasks.add(task);
+    }
 
+    public int size() {
+        return tasks.size();
+    }
+
+    public Task markTask(int index) throws AtlasException {
+        checkIndex(index);
+        Task task = tasks.get(index - 1);
+        task.setDone(true);
+        return task;
+    }
+
+    public Task unmarkTask(int index) throws AtlasException {
+        checkIndex(index);
+        Task task = tasks.get(index - 1);
+        task.setDone(false);
+        return task;
+    }
+
+    public Task deleteTask(int index) throws AtlasException {
+        checkIndex(index);
+        return tasks.remove(index - 1);
+    }
+
+    public ArrayList<Task> findTasks(String keyword) {
+        ArrayList<Task> result = new ArrayList<>();
         for (Task task : tasks) {
-            if (task.getDescription().toLowerCase().contains(lowerKeyword)) {
-                results.add(task);
+            if (task.getDescription().contains(keyword)) {
+                result.add(task);
             }
         }
+        return result;
+    }
 
-        return results;
+    private void checkIndex(int index) throws AtlasException {
+        if (index < 1 || index > tasks.size()) {
+            throw new AtlasException("Invalid task number.");
+        }
     }
 }

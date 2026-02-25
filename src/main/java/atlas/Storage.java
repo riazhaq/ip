@@ -1,17 +1,8 @@
 package atlas;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.time.LocalDate;
+import java.io.*;
 import java.util.ArrayList;
 
-/**
- * Handles loading and saving tasks to persistent storage.
- */
 public class Storage {
 
     private final String filePath;
@@ -20,109 +11,38 @@ public class Storage {
         this.filePath = filePath;
     }
 
-    /**
-     * Loads tasks from the data file.
-     * If the file does not exist, returns an empty task list.
-     */
-    public ArrayList<Task> load() throws AtlasException {
+    public ArrayList<Task> load() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
         File file = new File(filePath);
 
         if (!file.exists()) {
-            return tasks; // first run: no data file yet
+            file.getParentFile().mkdirs();
+            file.createNewFile();
+            return tasks;
         }
 
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        String line;
 
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(" \\| ");
-
-                String type = parts[0];
-                boolean isDone = parts[1].equals("1");
-
-                Task task;
-
-                switch (type) {
-                    case "T":
-                        task = new Todo(parts[2]);
-                        break;
-
-                    case "D":
-                        task = new Deadline(
-                                parts[2],
-                                LocalDate.parse(parts[3])
-                        );
-                        break;
-
-                    case "E":
-                        task = new Event(
-                                parts[2],
-                                LocalDate.parse(parts[3]),
-                                LocalDate.parse(parts[4])
-                        );
-                        break;
-
-                    default:
-                        throw new AtlasException("Corrupted data file.");
-                }
-
-                if (isDone) {
-                    task.markDone();
-                }
-
+        while ((line = reader.readLine()) != null) {
+            Task task = Task.fromStorageString(line);
+            if (task != null) {
                 tasks.add(task);
             }
-
-        } catch (IOException | RuntimeException e) {
-            // RuntimeException covers DateTimeParseException for corrupted files
-            throw new AtlasException("Error loading data file.");
         }
 
+        reader.close();
         return tasks;
     }
 
-    /**
-     * Saves the current task list to the data file.
-     */
-    public void save(ArrayList<Task> tasks) throws AtlasException {
-        try {
-            File file = new File(filePath);
-            file.getParentFile().mkdirs(); // create ./data folder if needed
+    public void save(ArrayList<Task> tasks) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
 
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-                for (Task task : tasks) {
-                    bw.write(encode(task));
-                    bw.newLine();
-                }
-            }
-
-        } catch (IOException e) {
-            throw new AtlasException("Error saving data.");
+        for (Task task : tasks) {
+            writer.write(task.toStorageString());
+            writer.newLine();
         }
-    }
 
-    /**
-     * Converts a task into a storable string format.
-     * Dates are saved in ISO format (yyyy-mm-dd).
-     */
-    private String encode(Task task) {
-        if (task instanceof Todo) {
-            return "T | " + (task.isDone ? "1" : "0")
-                    + " | " + task.description;
-
-        } else if (task instanceof Deadline) {
-            Deadline d = (Deadline) task;
-            return "D | " + (task.isDone ? "1" : "0")
-                    + " | " + d.description
-                    + " | " + d.getBy(); // LocalDate -> yyyy-mm-dd
-
-        } else {
-            Event e = (Event) task;
-            return "E | " + (task.isDone ? "1" : "0")
-                    + " | " + e.description
-                    + " | " + e.getFrom()
-                    + " | " + e.getTo();
-        }
+        writer.close();
     }
 }

@@ -9,7 +9,7 @@ public class Parser {
             return new ParsedCommand(CommandType.LIST);
         }
 
-        if (trimmed.equals("exit")) {
+        if (trimmed.equals("exit") || trimmed.equals("bye")) {
             return new ParsedCommand(CommandType.EXIT);
         }
 
@@ -59,7 +59,7 @@ public class Parser {
 
     private static int parseIndex(String input, int start) throws AtlasException {
         try {
-            return Integer.parseInt(input.substring(start).trim()) - 1;
+            return Integer.parseInt(input.substring(start).trim());
         } catch (NumberFormatException e) {
             throw new AtlasException("Please provide a valid task number.");
         }

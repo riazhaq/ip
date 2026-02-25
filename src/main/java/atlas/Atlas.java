@@ -1,8 +1,6 @@
 package atlas;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.time.LocalDate;
 
+import java.io.IOException;
 
 public class Atlas {
 
@@ -14,79 +12,80 @@ public class Atlas {
         ui = new Ui();
         storage = new Storage("data/atlas.txt");
         tasks = new TaskList();
-    }
 
-    public void run() {
-        Scanner scanner = new Scanner(System.in);
-        boolean isExit = false;
-
-        while (!isExit) {
-            try {
-                String input = scanner.nextLine();
-                ParsedCommand command = Parser.parse(input);
-
-                switch (command.getCommandType()) {
-
-                    case TODO: {
-                        Task todo = new Todo(command.getArgument());
-                        tasks.add(todo);
-                        ui.showTaskAdded(todo, tasks.size());
-                        break;
-                    }
-
-                    case DEADLINE: {
-                        String[] parts = command.getArgument().split("/by");
-                        String description = parts[0].trim();
-                        LocalDate by = LocalDate.parse(parts[1].trim());
-
-                        Task deadline = new Deadline(description, by);
-                        tasks.add(deadline);
-                        ui.showTaskAdded(deadline, tasks.size());
-                        break;
-                    }
-
-
-                    case EVENT: {
-                        String[] parts = command.getArgument().split("/from|/to");
-                        String description = parts[0].trim();
-                        LocalDate from = LocalDate.parse(parts[1].trim());
-                        LocalDate to = LocalDate.parse(parts[2].trim());
-
-                        Task event = new Event(description, from, to);
-                        tasks.add(event);
-                        ui.showTaskAdded(event, tasks.size());
-                        break;
-                    }
-
-
-
-                    case LIST:
-                        ui.showTaskList(tasks.getTasks());
-                        break;
-
-                    case FIND:
-
-                        ArrayList<Task> foundTasks =
-                                tasks.findTasks(command.getArgument());
-                        ui.showFoundTasks(foundTasks);
-                        break;
-
-                    case EXIT:
-                        isExit = true;
-                        break;
-
-                    // other cases (todo, deadline, mark, etc.)
-                    default:
-                        break;
-                }
-
-            } catch (AtlasException e) {
-                ui.showError(e.getMessage());
-            }
+        try {
+            tasks.setTasks(storage.load());
+        } catch (IOException e) {
+            // If file not found, start with empty list
         }
     }
 
-    public static void main(String[] args) {
-        new Atlas().run();
+    public String getResponse(String input) {
+        try {
+            ParsedCommand command = Parser.parse(input);
+            CommandType type = command.getCommandType();
+
+            switch (type) {
+
+                case LIST:
+                    return ui.getTaskListString(tasks.getTasks());
+
+                case FIND:
+                    return ui.getFoundTasksString(
+                            tasks.findTasks(command.getArgument())
+                    );
+
+                case TODO:
+                    Task todo = new Todo(command.getArgument());
+                    tasks.add(todo);
+                    storage.save(tasks.getTasks());
+                    return ui.getAddTaskString(todo, tasks.size());
+
+                case DEADLINE:
+                    Task deadline = new Deadline(
+                            command.getArgument(),
+                            command.getDate()
+                    );
+                    tasks.add(deadline);
+                    storage.save(tasks.getTasks());
+                    return ui.getAddTaskString(deadline, tasks.size());
+
+                case EVENT:
+                    Task event = new Event(
+                            command.getArgument(),
+                            command.getFrom(),
+                            command.getTo()
+                    );
+                    tasks.add(event);
+                    storage.save(tasks.getTasks());
+                    return ui.getAddTaskString(event, tasks.size());
+
+                case MARK:
+                    Task marked = tasks.markTask(command.getIndex());
+                    storage.save(tasks.getTasks());
+                    return ui.getMarkString(marked);
+
+                case UNMARK:
+                    Task unmarked = tasks.unmarkTask(command.getIndex());
+                    storage.save(tasks.getTasks());
+                    return ui.getUnmarkString(unmarked);
+
+                case DELETE:
+                    Task deleted = tasks.deleteTask(command.getIndex());
+                    storage.save(tasks.getTasks());
+                    return ui.getDeleteString(deleted, tasks.size());
+
+                case EXIT:
+                    return ui.getExitString();
+
+                default:
+                    return ui.getErrorString("Unknown command.");
+            }
+
+        } catch (AtlasException e) {
+            return ui.getErrorString(e.getMessage());
+        } catch (IOException e) {
+            return "Error saving data.";
+        }
     }
 }
