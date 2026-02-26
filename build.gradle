@@ -3,7 +3,7 @@ plugins {
     id 'application'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'checkstyle'
-    id 'org.openjfx.javafxplugin' version '0.0.14'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 }
 
 repositories {
@@ -51,10 +51,14 @@ test {
 }
 
 application {
-    mainClass.set("atlas.Launcher")
+    mainModule = 'atlas'
+    mainClass = 'atlas.Launcher'
 }
 
-
+javafx {
+    version = "17" // Should match your Zulu 17 version
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
 
 shadowJar {
     archiveBaseName = "duke"
