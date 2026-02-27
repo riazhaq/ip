@@ -61,8 +61,9 @@ javafx {
 }
 
 shadowJar {
-    archiveBaseName = "duke"
-    archiveClassifier = null
+    archiveBaseName.set('atlas')
+    archiveClassifier.set('')
+    archiveVersion.set('')
 }
 
 

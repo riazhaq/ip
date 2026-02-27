@@ -1,5 +1,7 @@
 package atlas;
 
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -7,10 +9,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
-/**
- * Controller for the main GUI.
- */
 public class MainWindow extends AnchorPane {
     @FXML
     private ScrollPane scrollPane;
@@ -23,25 +23,21 @@ public class MainWindow extends AnchorPane {
 
     private Atlas atlas;
 
-    // Load images using Stream for better reliability across different systems
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
-    private Image atlasImage = new Image(this.getClass().getResourceAsStream("/images/DaAtlas.png"));
+    private final Image userImage = new Image(this.getClass().getResourceAsStream("/images/DaUser.png"));
+    private final Image atlasImage = new Image(this.getClass().getResourceAsStream("/images/DaAtlas.png"));
 
     @FXML
     public void initialize() {
-        // Automatically scroll down when new messages are added
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
+        dialogContainer.getChildren().add(
+                DialogBox.getAtlasDialog("Greetings! I am Atlas. How can I help you today?", atlasImage)
+        );
     }
 
-    /** Injects the Atlas instance */
     public void setAtlas(Atlas a) {
         atlas = a;
     }
 
-    /**
-     * Creates two dialog boxes, one echoing user input and the other containing Atlas's reply.
-     * Clears the user input after processing.
-     */
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
@@ -49,7 +45,17 @@ public class MainWindow extends AnchorPane {
             return;
         }
 
+        if (input.trim().equalsIgnoreCase("bye")) {
+            userInput.setDisable(true);
+            sendButton.setDisable(true);
+            PauseTransition delay = new PauseTransition(Duration.seconds(1.5));
+            delay.setOnFinished(event -> Platform.exit());
+            delay.play();
+        }
+
         String response = atlas.getResponse(input);
+
+        // FIXED: Only add to children once to avoid "Duplicate Children" error
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getAtlasDialog(response, atlasImage)
