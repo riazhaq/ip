@@ -1,51 +1,67 @@
 package atlas;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
-
 public class Parser {
 
     public static ParsedCommand parse(String input) throws AtlasException {
-        assert input != null : "Parser received a null input string";
-        input = input.trim();
+        String trimmed = input.trim();
 
-        if (input.equals("bye")) return new ParsedCommand(CommandType.BYE);
-        if (input.equals("list")) return new ParsedCommand(CommandType.LIST);
-
-        if (input.startsWith("todo")) return parseTodo(input);
-        if (input.startsWith("deadline")) return parseDeadline(input);
-        if (input.startsWith("event")) return parseEvent(input);
-
-        // Handle mark/unmark/delete
-        if (input.startsWith("mark")) return new ParsedCommand(CommandType.MARK, parseIndex(input, 5));
-        if (input.startsWith("unmark")) return new ParsedCommand(CommandType.UNMARK, parseIndex(input, 7));
-        if (input.startsWith("delete")) return new ParsedCommand(CommandType.DELETE, parseIndex(input, 7));
-
-        throw new AtlasException("I don't know what that command means.");
-    }
-
-    private static ParsedCommand parseTodo(String input) throws AtlasException {
-        if (input.length() <= 5) throw new AtlasException("A todo needs a description.");
-        return new ParsedCommand(CommandType.TODO, input.substring(5));
-    }
-
-    private static ParsedCommand parseDeadline(String input) throws AtlasException {
-        if (!input.contains("/by")) throw new AtlasException("A deadline needs a /by date.");
-        String[] parts = input.substring(9).split("/by", 2);
-        try {
-            LocalDate by = LocalDate.parse(parts[1].trim());
-            return new ParsedCommand(CommandType.DEADLINE, parts[0].trim(), by);
-        } catch (DateTimeParseException e) {
-            throw new AtlasException("Please use date format yyyy-mm-dd.");
+        if (trimmed.equals("list")) {
+            return new ParsedCommand(CommandType.LIST);
         }
+
+        if (trimmed.equals("exit") || trimmed.equals("bye")) {
+            return new ParsedCommand(CommandType.EXIT);
+        }
+
+        if (trimmed.startsWith("find")) {
+            String keyword = trimmed.substring(4).trim();
+            if (keyword.isEmpty()) {
+                throw new AtlasException("Please provide a keyword to search for.");
+            }
+            return new ParsedCommand(CommandType.FIND, keyword);
+        }
+
+        if (trimmed.startsWith("mark")) {
+            int index = parseIndex(trimmed, 4);
+            return new ParsedCommand(CommandType.MARK, index);
+        }
+
+        if (trimmed.startsWith("unmark")) {
+            int index = parseIndex(trimmed, 6);
+            return new ParsedCommand(CommandType.UNMARK, index);
+        }
+
+        if (trimmed.startsWith("delete")) {
+            int index = parseIndex(trimmed, 6);
+            return new ParsedCommand(CommandType.DELETE, index);
+        }
+
+        if (trimmed.startsWith("todo")) {
+            String description = trimmed.substring(4).trim();
+            if (description.isEmpty()) {
+                throw new AtlasException("The description of a todo cannot be empty.");
+            }
+            return new ParsedCommand(CommandType.TODO, description);
+        }
+
+        if (trimmed.startsWith("deadline")) {
+            String details = trimmed.substring(8).trim();
+            return new ParsedCommand(CommandType.DEADLINE, details);
+        }
+
+        if (trimmed.startsWith("event")) {
+            String details = trimmed.substring(5).trim();
+            return new ParsedCommand(CommandType.EVENT, details);
+        }
+
+        throw new AtlasException("I'm sorry, but I don't know what that means.");
     }
-    
+
     private static int parseIndex(String input, int start) throws AtlasException {
         try {
-            return Integer.parseInt(input.substring(start).trim()) - 1;
+            return Integer.parseInt(input.substring(start).trim());
         } catch (NumberFormatException e) {
             throw new AtlasException("Please provide a valid task number.");
         }
     }
 }
-

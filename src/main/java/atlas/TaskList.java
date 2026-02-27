@@ -3,37 +3,61 @@ package atlas;
 import java.util.ArrayList;
 
 public class TaskList {
-    private final ArrayList<Task> tasks;
+
+    private ArrayList<Task> tasks;
 
     public TaskList() {
         this.tasks = new ArrayList<>();
     }
 
-    public TaskList(ArrayList<Task> tasks) {
+    public void setTasks(ArrayList<Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public ArrayList<Task> getTasks() {
+        return tasks;
     }
 
     public void add(Task task) {
         tasks.add(task);
     }
 
-    public Task get(int index) {
-        return tasks.get(index);
-    }
-
-    public Task remove(int index) {
-        return tasks.remove(index);
-    }
-
     public int size() {
         return tasks.size();
     }
 
-    public boolean isEmpty() {
-        return tasks.isEmpty();
+    public Task markTask(int index) throws AtlasException {
+        checkIndex(index);
+        Task task = tasks.get(index - 1);
+        task.setDone(true);
+        return task;
     }
 
-    public ArrayList<Task> getAll() {
-        return tasks;
+    public Task unmarkTask(int index) throws AtlasException {
+        checkIndex(index);
+        Task task = tasks.get(index - 1);
+        task.setDone(false);
+        return task;
+    }
+
+    public Task deleteTask(int index) throws AtlasException {
+        checkIndex(index);
+        return tasks.remove(index - 1);
+    }
+
+    public ArrayList<Task> findTasks(String keyword) {
+        ArrayList<Task> result = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.getDescription().contains(keyword)) {
+                result.add(task);
+            }
+        }
+        return result;
+    }
+
+    private void checkIndex(int index) throws AtlasException {
+        if (index < 1 || index > tasks.size()) {
+            throw new AtlasException("Invalid task number.");
+        }
     }
 }

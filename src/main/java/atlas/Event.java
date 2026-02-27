@@ -1,8 +1,9 @@
 package atlas;
+
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class Event extends Task {
+
     private LocalDate from;
     private LocalDate to;
 
@@ -12,23 +13,23 @@ public class Event extends Task {
         this.to = to;
     }
 
-    public LocalDate getFrom() {
-        return from;
-    }
-
-    public LocalDate getTo() {
-        return to;
+    @Override
+    public String toString() {
+        return "[E]" + getStatusIcon() + " "
+                + description + " (from: "
+                + from + " to: " + to + ")";
     }
 
     @Override
-    public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy");
-        return "[E]" + super.toString()
-                + " (from: " + from.format(formatter)
-                + " to: " + to.format(formatter) + ")";
+    protected String getType() {
+        return "";
+    }
+
+    @Override
+    public String toStorageString() {
+        return "E | " + (isDone ? "1" : "0")
+                + " | " + description
+                + " | " + from
+                + " | " + to;
     }
 }
-
-
-
-

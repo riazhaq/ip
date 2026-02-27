@@ -1,92 +1,91 @@
 package atlas;
 
+import java.io.IOException;
 
 public class Atlas {
 
-    public static void main(String[] args) {
-        Ui ui = new Ui();
-        Storage storage = new Storage("./data/atlas.txt");
-        TaskList tasks;
+    private final TaskList tasks;
+    private final Storage storage;
+    private final Ui ui;
+
+    public Atlas() {
+        ui = new Ui();
+        storage = new Storage("data/atlas.txt");
+        tasks = new TaskList();
 
         try {
-            tasks = new TaskList(storage.load());
-        } catch (AtlasException e) {
-            ui.showMessage("Starting with an empty task list.");
-            tasks = new TaskList();
+            tasks.setTasks(storage.load());
+        } catch (IOException e) {
+            // If file not found, start with empty list
         }
+    }
 
-        ui.showWelcome();
+    public String getResponse(String input) {
+        try {
+            ParsedCommand command = Parser.parse(input);
+            CommandType type = command.getCommandType();
 
-        boolean isExit = false;
+            switch (type) {
 
-        while (!isExit) {
-            try {
-                ParsedCommand command = Parser.parse(ui.readCommand());
+                case LIST:
+                    return ui.getTaskListString(tasks.getTasks());
 
-                switch (command.type) {
+                case FIND:
+                    return ui.getFoundTasksString(
+                            tasks.findTasks(command.getArgument())
+                    );
 
-                    case BYE:
-                        ui.showGoodbye();
-                        isExit = true;
-                        break;
+                case TODO:
+                    Task todo = new Todo(command.getArgument());
+                    tasks.add(todo);
+                    storage.save(tasks.getTasks());
+                    return ui.getAddTaskString(todo, tasks.size());
 
-                    case LIST:
-                        if (tasks.isEmpty()) {
-                            ui.showMessage("Your task list is empty.");
-                            break;
-                        }
-                        ui.showMessage("Here are the tasks in your list:");
-                        for (int i = 0; i < tasks.size(); i++) {
-                            ui.showMessage((i + 1) + ". " + tasks.get(i));
-                        }
-                        break;
+                case DEADLINE:
+                    Task deadline = new Deadline(
+                            command.getArgument(),
+                            command.getDate()
+                    );
+                    tasks.add(deadline);
+                    storage.save(tasks.getTasks());
+                    return ui.getAddTaskString(deadline, tasks.size());
 
-                    case TODO:
-                        tasks.add(new Todo(command.description));
-                        storage.save(tasks.getAll());
-                        ui.showMessage("Got it. I've added this task:");
-                        ui.showMessage("  " + tasks.get(tasks.size() - 1));
-                        break;
+                case EVENT:
+                    Task event = new Event(
+                            command.getArgument(),
+                            command.getFrom(),
+                            command.getTo()
+                    );
+                    tasks.add(event);
+                    storage.save(tasks.getTasks());
+                    return ui.getAddTaskString(event, tasks.size());
 
-                    case DEADLINE:
-                        tasks.add(new Deadline(command.description, command.date1));
-                        storage.save(tasks.getAll());
-                        ui.showMessage("Got it. I've added this task:");
-                        ui.showMessage("  " + tasks.get(tasks.size() - 1));
-                        break;
+                case MARK:
+                    Task marked = tasks.markTask(command.getIndex());
+                    storage.save(tasks.getTasks());
+                    return ui.getMarkString(marked);
 
-                    case EVENT:
-                        tasks.add(new Event(command.description, command.date1, command.date2));
-                        storage.save(tasks.getAll());
-                        ui.showMessage("Got it. I've added this task:");
-                        ui.showMessage("  " + tasks.get(tasks.size() - 1));
-                        break;
+                case UNMARK:
+                    Task unmarked = tasks.unmarkTask(command.getIndex());
+                    storage.save(tasks.getTasks());
+                    return ui.getUnmarkString(unmarked);
 
-                    case MARK:
-                        tasks.get(command.index).markDone();
-                        storage.save(tasks.getAll());
-                        ui.showMessage("Nice! I've marked this task as done:");
-                        ui.showMessage("  " + tasks.get(command.index));
-                        break;
+                case DELETE:
+                    Task deleted = tasks.deleteTask(command.getIndex());
+                    storage.save(tasks.getTasks());
+                    return ui.getDeleteString(deleted, tasks.size());
 
-                    case UNMARK:
-                        tasks.get(command.index).markUndone();
-                        storage.save(tasks.getAll());
-                        ui.showMessage("OK, I've marked this task as not done yet:");
-                        ui.showMessage("  " + tasks.get(command.index));
-                        break;
+                case EXIT:
+                    return ui.getExitString();
 
-                    case DELETE:
-                        ui.showMessage("Noted. I've removed this task:");
-                        ui.showMessage("  " + tasks.remove(command.index));
-                        storage.save(tasks.getAll());
-                        ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
-                        break;
-                }
-
-            } catch (AtlasException e) {
-                ui.showError(e.getMessage());
+                default:
+                    return ui.getErrorString("Unknown command.");
             }
+
+        } catch (AtlasException e) {
+            return ui.getErrorString(e.getMessage());
+        } catch (IOException e) {
+            return "Error saving data.";
         }
     }
 }
