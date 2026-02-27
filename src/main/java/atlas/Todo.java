@@ -1,8 +1,5 @@
 package atlas;
 
-/**
- * Represents a task without a date or time.
- */
 public class Todo extends Task {
 
     public Todo(String description) {
@@ -15,13 +12,12 @@ public class Todo extends Task {
     }
 
     @Override
-    public String toString() {
-        return "[T]" + super.toString();
+    public String toStorageString() {
+        return "T | " + (isDone ? "1" : "0") + " | " + description;
     }
 
     @Override
-    public String toStorageString() {
-        return "T | " + (isDone ? "1" : "0")
-                + " | " + description;
+    public String toString() {
+        return "[T]" + super.toString();
     }
 }
