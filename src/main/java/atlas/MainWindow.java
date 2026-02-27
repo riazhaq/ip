@@ -29,13 +29,16 @@ public class MainWindow extends AnchorPane {
 
     @FXML
     public void initialize() {
-        // Automatically scroll down when new messages are added
         scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
     }
 
-    /** Injects the Atlas instance */
     public void setAtlas(Atlas a) {
         atlas = a;
+
+        String welcomeMessage = atlas.getWelcomeString();
+        dialogContainer.getChildren().addAll(
+                DialogBox.getAtlasDialog(welcomeMessage, atlasImage)
+        );
     }
 
     /**
@@ -45,10 +48,9 @@ public class MainWindow extends AnchorPane {
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
-        if (input.isEmpty()) {
-            return;
+        if (input.trim().isEmpty()) {
+            return; // Do nothing for empty input to avoid errors
         }
-
         String response = atlas.getResponse(input);
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),

@@ -6,6 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class Main extends Application {
 
     private Atlas atlas = new Atlas();
@@ -13,20 +15,17 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    Main.class.getResource("/view/MainWindow.fxml")
-            );
-            AnchorPane root = loader.load();
-
-            MainWindow controller = loader.getController();
-            controller.setAtlas(atlas);
-
-            Scene scene = new Scene(root);
+            FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
+            AnchorPane ap = fxmlLoader.load();
+            Scene scene = new Scene(ap);
             stage.setScene(scene);
-            stage.setTitle("Atlas");
-            stage.show();
+            stage.setTitle("Atlas Task Navigator");
 
-        } catch (Exception e) {
+            // Inject the Atlas instance into the controller
+            fxmlLoader.<MainWindow>getController().setAtlas(new Atlas());
+
+            stage.show();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

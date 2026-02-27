@@ -75,4 +75,9 @@ public class Atlas {
         storage.save(tasks.getTasks()); // Save after deleting
         return ui.getDeleteString(t, tasks.size());
     }
+
+    // Inside Atlas.java
+    public String getWelcomeString() {
+        return ui.getWelcomeString();
+    }
 }
