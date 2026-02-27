@@ -25,31 +25,46 @@ public abstract class Task {
 
     /**
      * Converts a storage line back into a Task object.
-     * Required by Storage.java to load your data.
+     * Skips corrupted lines or "null" dates to prevent startup crashes.
      */
     public static Task fromStorageString(String line) {
-        String[] parts = line.split(" \\| ");
-        String type = parts[0];
-        boolean done = parts[1].equals("1");
-        String description = parts[2];
-
-        Task task;
-        switch (type) {
-            case "T":
-                task = new Todo(description);
-                break;
-            case "D":
-                task = new Deadline(description, java.time.LocalDate.parse(parts[3]));
-                break;
-            case "E":
-                task = new Event(description, java.time.LocalDate.parse(parts[3]),
-                        java.time.LocalDate.parse(parts[4]));
-                break;
-            default:
-                return null;
+        if (line == null || line.trim().isEmpty()) {
+            return null;
         }
-        task.setDone(done);
-        return task;
+        try {
+            String[] parts = line.split(" \\| ");
+            if (parts.length < 3) return null;
+
+            String type = parts[0];
+            boolean done = parts[1].equals("1");
+            String description = parts[2];
+
+            Task task;
+            switch (type) {
+                case "T":
+                    task = new Todo(description);
+                    break;
+                case "D":
+                    // If date is "null" or missing, skip this task
+                    if (parts.length < 4 || parts[3].equals("null")) return null;
+                    task = new Deadline(description, java.time.LocalDate.parse(parts[3]));
+                    break;
+                case "E":
+                    // If either date is "null" or missing, skip this task
+                    if (parts.length < 5 || parts[3].equals("null") || parts[4].equals("null")) return null;
+                    task = new Event(description, java.time.LocalDate.parse(parts[3]),
+                            java.time.LocalDate.parse(parts[4]));
+                    break;
+                default:
+                    return null;
+            }
+            task.setDone(done);
+            return task;
+        } catch (Exception e) {
+            // Log the error but don't crash the app
+            System.err.println("Skipping corrupted line: " + line);
+            return null;
+        }
     }
 
     @Override

@@ -13,6 +13,7 @@ public enum CommandType {
     UNMARK,
     DELETE,
     EXIT,
-    FIND
+    FIND,
+    SORT
 }
 

@@ -14,8 +14,8 @@ public class Deadline extends Task {
 
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " +
-                by.format(DateTimeFormatter.ofPattern("MMM dd yyyy")) + ")";
+        String dateStr = (by == null) ? "no date" : by.format(DateTimeFormatter.ofPattern("MMM dd yyyy"));
+        return "[D]" + super.toString() + " (by: " + dateStr + ")";
     }
 
     @Override

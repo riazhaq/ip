@@ -11,6 +11,10 @@ public class TaskList {
     public void add(Task task) { tasks.add(task); }
     public int size() { return tasks.size(); }
 
+    public void sortTasks() {
+        tasks.sort((t1, t2) -> t1.getDescription().compareToIgnoreCase(t2.getDescription()));
+    }
+
     public boolean isDuplicate(Task newTask) {
         for (Task task : tasks) {
             if (task.equals(newTask)) return true;
