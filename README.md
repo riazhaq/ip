@@ -1,26 +1,63 @@
-# Duke project template
+# Atlas Task Navigator - User Guide
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+Welcome to **Atlas**, your mission-critical task management companion. Atlas helps you organize your daily objectives with precision and ease.
 
-## Setting up in Intellij
+---
 
-Prerequisites: JDK 17, update Intellij to the most recent version.
+## Quick Start
+1. Ensure you have **Java 17** or above installed.
+2. Download the latest `atlas.jar` from our releases.
+3. Open your terminal, navigate to the folder, and run:  
+   `java -jar atlas.jar`
+4. Use the command box to start navigating your tasks!
 
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 17** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/Duke.java` file, right-click it, and choose `Run Duke.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
-   ```
-   Hello from
-    ____        _        
-   |  _ \ _   _| | _____ 
-   | | | | | | | |/ / _ \
-   | |_| | |_| |   <  __/
-   |____/ \__,_|_|\_\___|
-   ```
+---
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+## Features 
+
+### 1. Manage To-dos: `todo`
+Adds a basic task without any specific date/time.
+* **Format:** `todo [description]`
+* **Example:** `todo Read Harry Potter`
+
+### 2. Manage Deadlines: `deadline`
+Adds a task that needs to be completed by a specific date.
+* **Format:** `deadline [description] /by [YYYY-MM-DD]`
+* **Example:** `deadline Return book /by 2026-03-01`
+
+### 3. Manage Events: `event`
+Adds a task that spans a specific time period.
+* **Format:** `event [description] /from [YYYY-MM-DD] /to [YYYY-MM-DD]`
+* **Example:** `event Career Fair /from 2026-03-10 /to 2026-03-12`
+
+### 4. Organize the List: `sort`
+Alphabetizes your entire task list based on the description.
+* **Format:** `sort`
+
+### 5. Locate Tasks: `find`
+Filters your list to show tasks containing a specific keyword.
+* **Format:** `find [keyword]`
+* **Example:** `find book`
+
+### 6. Mark as Complete: `mark`
+Marks a task as finished.
+* **Format:** `mark [index]`
+* **Example:** `mark 1`
+
+### 7. Remove Tasks: `delete`
+Deletes a task permanently from the records.
+* **Format:** `delete [index]`
+* **Example:** `delete 2`
+
+### 8. Exit System: `bye` / `exit`
+Safely saves your data and closes the application.
+
+---
+
+## Data Persistence
+Atlas automatically saves your data in `data/atlas.txt`. This file is updated after every command, so your progress is never lost, even if the system crashes.
+
+## FAQ
+**Q: What happens if I enter a wrong date format?** A: Atlas will catch the error and ask you to use the `YYYY-MM-DD` format.
+
+**Q: Can I add duplicate tasks?** A: No, Atlas prevents duplicate entries to keep your navigation records clean.
