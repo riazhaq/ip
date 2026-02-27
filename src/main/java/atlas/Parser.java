@@ -6,6 +6,9 @@ import java.time.format.DateTimeParseException;
 public class Parser {
 
     public static ParsedCommand parse(String input) throws AtlasException {
+        // Assertion: The UI should never pass a null string to the parser
+        assert input != null : "Parser received a null input string";
+
         input = input.trim();
 
         if (input.equals("bye")) {
@@ -20,7 +23,10 @@ public class Parser {
             if (input.length() <= 4) {
                 throw new AtlasException("A todo needs a description.");
             }
-            return new ParsedCommand(CommandType.TODO, input.substring(5));
+            String desc = input.substring(5);
+            // Assertion: description should not be null after substring logic
+            assert desc != null : "Todo description is null";
+            return new ParsedCommand(CommandType.TODO, desc);
         }
 
         if (input.startsWith("deadline")) {
@@ -47,6 +53,9 @@ public class Parser {
             }
 
             String[] parts = input.substring(6).split("/from|/to");
+            // Assertion: split should result in at least 3 parts for an event
+            assert parts.length >= 3 : "Event command split incorrectly";
+
             if (parts[0].trim().isEmpty()) {
                 throw new AtlasException("Event description cannot be empty.");
             }
@@ -83,4 +92,3 @@ public class Parser {
         }
     }
 }
-
