@@ -2,11 +2,19 @@ package atlas;
 
 import java.io.IOException;
 
+/**
+ * The main logic controller for the Atlas task management system.
+ * It coordinates interaction between the user interface, task storage, and task list operations.
+ */
 public class Atlas {
     private final TaskList tasks;
     private final Storage storage;
     private final Ui ui;
 
+    /**
+     * Initializes a new Atlas instance.
+     * Sets up the UI, storage path, and attempts to load existing tasks from the data file.
+     */
     public Atlas() {
         ui = new Ui();
         storage = new Storage("data/atlas.txt");
@@ -19,6 +27,14 @@ public class Atlas {
         }
     }
 
+    /**
+     * Processes user input and returns a string response.
+     * This method handles the parsing of commands, execution of task operations,
+     * duplicate detection, and data persistence.
+     *
+     * @param input The raw string input from the user.
+     * @return A formatted response string to be displayed in the GUI.
+     */
     public String getResponse(String input) {
         try {
             ParsedCommand command = Parser.parse(input);
@@ -58,25 +74,50 @@ public class Atlas {
         }
     }
 
+    /**
+     * Handles the logic for marking a task as complete.
+     * * @param index The 1-based index of the task in the list.
+     * @return A confirmation message from the UI.
+     * @throws AtlasException If the index is invalid.
+     * @throws IOException If there is an error saving the updated list.
+     */
     private String handleMark(int index) throws AtlasException, IOException {
         Task t = tasks.markTask(index);
         storage.save(tasks.getTasks()); // Save after marking
         return ui.getMarkString(t);
     }
 
+    /**
+     * Handles the logic for marking a task as incomplete.
+     * * @param index The 1-based index of the task in the list.
+     * @return A confirmation message from the UI.
+     * @throws AtlasException If the index is invalid.
+     * @throws IOException If there is an error saving the updated list.
+     */
     private String handleUnmark(int index) throws AtlasException, IOException {
         Task t = tasks.unmarkTask(index);
         storage.save(tasks.getTasks()); // Save after unmarking
         return ui.getUnmarkString(t);
     }
 
+    /**
+     * Handles the removal of a task from the list.
+     * * @param index The 1-based index of the task to be deleted.
+     * @return A confirmation message indicating the task was removed.
+     * @throws AtlasException If the index is invalid.
+     * @throws IOException If there is an error saving the updated list.
+     */
     private String handleDelete(int index) throws AtlasException, IOException {
         Task t = tasks.deleteTask(index);
         storage.save(tasks.getTasks()); // Save after deleting
         return ui.getDeleteString(t, tasks.size());
     }
 
-    // Inside Atlas.java
+    /**
+     * Retrieves the initial greeting and instruction message for the user.
+     *
+     * @return A welcome string containing the Quick Start guide.
+     */
     public String getWelcomeString() {
         return ui.getWelcomeString();
     }

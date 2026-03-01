@@ -2,10 +2,19 @@ package atlas;
 
 import java.util.Objects;
 
+/**
+ * Represents a generic task in the Atlas application.
+ * Encapsulates a description and completion status, providing methods
+ * for storage conversion and equality checks.
+ */
 public abstract class Task {
     protected String description;
     protected boolean isDone;
 
+    /**
+     * Constructs a new Task with the given description.
+     * @param description The task description.
+     */
     public Task(String description) {
         this.description = description;
         this.isDone = false;
@@ -13,9 +22,17 @@ public abstract class Task {
 
     public void setDone(boolean done) { this.isDone = done; }
     public String getDescription() { return description; }
+
+    /**
+     * Returns an icon representing the completion status.
+     * @return "[X]" if done, "[ ]" otherwise.
+     */
     public String getStatusIcon() { return isDone ? "[X]" : "[ ]"; }
 
+    /** Returns the single-character type code for the task. */
     protected abstract String getType();
+
+    /** Returns a string formatted for file storage. */
     public abstract String toStorageString();
 
     @Override
@@ -66,6 +83,7 @@ public abstract class Task {
             return null;
         }
     }
+
 
     @Override
     public boolean equals(Object obj) {

@@ -61,8 +61,13 @@ javafx {
 }
 
 shadowJar {
-    archiveBaseName = "duke"
-    archiveClassifier = null
+    archiveBaseName.set('atlas')
+    archiveClassifier.set('')
+    archiveVersion.set('0.1')
+
+    manifest {
+        attributes 'Main-Class': 'atlas.Launcher'
+    }
 }
 
 

@@ -1,7 +1,19 @@
 package atlas;
 
+/**
+ * Handles the interpretation of raw user input.
+ * It translates string commands into {@code ParsedCommand} objects and validates
+ * the syntax of the input.
+ */
 public class Parser {
 
+    /**
+     * Parses the user input string into a structured ParsedCommand.
+     *
+     * @param input The raw input from the user.
+     * @return A ParsedCommand object representing the user's intent.
+     * @throws AtlasException If the command format is invalid or missing required parts.
+     */
     public static ParsedCommand parse(String input) throws AtlasException {
         String trimmed = input.trim();
 
@@ -75,6 +87,10 @@ public class Parser {
 
     /**
      * Helper method to parse the task index from a command string.
+     * @param input The command string.
+     * @param start The index where the number part is expected to begin.
+     * @return The integer task index.
+     * @throws AtlasException If the index part is missing or not a valid number.
      */
     private static int parseIndex(String input, int start) throws AtlasException {
         try {

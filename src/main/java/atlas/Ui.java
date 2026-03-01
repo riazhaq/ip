@@ -27,6 +27,7 @@ public class Ui {
                 + "What would you like to do?";
     }
 
+    /** Returns a formatted string of all tasks in the list. */
     public String getTaskListString(ArrayList<Task> tasks) {
         if (tasks.isEmpty()) {
             return "Your task list is currently empty, explorer.";
@@ -38,6 +39,7 @@ public class Ui {
         return sb.toString();
     }
 
+    /** Returns a formatted string of tasks matching a search keyword. */
     public String getFoundTasksString(ArrayList<Task> tasks) {
         if (tasks.isEmpty()) {
             return "No matching tasks found in our records.";

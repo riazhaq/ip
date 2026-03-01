@@ -8,10 +8,22 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * A GUI for Atlas using FXML.
+ * This class handles the loading of the primary stage, setting up the scene,
+ * and initializing the root layout of the application.
+ */
 public class Main extends Application {
 
     private Atlas atlas = new Atlas();
 
+    /**
+     * Starts the JavaFX application by loading the FXML for the main window,
+     * setting the scene, and injecting the Atlas logic engine into the controller.
+     *
+     * @param stage The primary stage for this application, onto which
+     * the application scene can be set.
+     */
     @Override
     public void start(Stage stage) {
         try {

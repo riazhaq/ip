@@ -1,7 +1,13 @@
 package atlas;
 
+/**
+ * Represents a simple task without a specific date or time.
+ */
 public class Todo extends Task {
-
+    /**
+     * Constructs a Todo task.
+     * @param description Description of the task.
+     */
     public Todo(String description) {
         super(description);
     }
