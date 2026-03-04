@@ -1,9 +1,8 @@
 plugins {
     id 'java'
     id 'application'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'checkstyle'
-    id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 repositories {
@@ -11,62 +10,43 @@ repositories {
 }
 
 dependencies {
-    String javaFxVersion = '17.0.2'
+    String jfxV = '17.0.7'
 
     // Testing
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.0'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.0'
 
-    def platforms = ['win', 'mac', 'linux']
-    def modules = ['base', 'controls', 'fxml', 'graphics']
-
-    modules.each { module ->
-        platforms.each { platform ->
-            implementation "org.openjfx:javafx-${module}:${javaFxVersion}:${platform}"
-        }
-    }
-}
-
-checkstyle {
-    toolVersion = '11.0.0'
-}
-
-
-test {
-    useJUnitPlatform()
-
-    testLogging {
-        events "passed", "skipped", "failed"
-
-        showExceptions true
-        exceptionFormat "full"
-        showCauses true
-        showStackTraces true
-        showStandardStreams = false
-    }
+    // Windows
+    implementation group: 'org.openjfx', name: 'javafx-base', version: jfxV, classifier: 'win'
+    implementation group: 'org.openjfx', name: 'javafx-controls', version: jfxV, classifier: 'win'
+    implementation group: 'org.openjfx', name: 'javafx-fxml', version: jfxV, classifier: 'win'
+    implementation group: 'org.openjfx', name: 'javafx-graphics', version: jfxV, classifier: 'win'
+    // Mac
+    implementation group: 'org.openjfx', name: 'javafx-base', version: jfxV, classifier: 'mac'
+    implementation group: 'org.openjfx', name: 'javafx-controls', version: jfxV, classifier: 'mac'
+    implementation group: 'org.openjfx', name: 'javafx-fxml', version: jfxV, classifier: 'mac'
+    implementation group: 'org.openjfx', name: 'javafx-graphics', version: jfxV, classifier: 'mac'
+    // Linux
+    implementation group: 'org.openjfx', name: 'javafx-base', version: jfxV, classifier: 'linux'
+    implementation group: 'org.openjfx', name: 'javafx-controls', version: jfxV, classifier: 'linux'
+    implementation group: 'org.openjfx', name: 'javafx-fxml', version: jfxV, classifier: 'linux'
+    implementation group: 'org.openjfx', name: 'javafx-graphics', version: jfxV, classifier: 'linux'
 }
 
 application {
-    mainModule = 'atlas'
-    mainClass = 'atlas.Launcher'
-}
-
-javafx {
-    version = "17.0.2"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    mainClass.set("atlas.Launcher")
 }
 
 shadowJar {
-    archiveBaseName.set('atlas')
-    archiveClassifier.set('')
-    archiveVersion.set('0.1')
-
-    manifest {
-        attributes 'Main-Class': 'atlas.Launcher'
-    }
+    archiveBaseName.set("atlas")
+    archiveClassifier.set(null)
+    configurations = [project.configurations.runtimeClasspath]
 }
 
-
-
-
-
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
+}
