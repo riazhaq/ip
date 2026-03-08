@@ -88,7 +88,7 @@ public class Atlas {
     }
 
     /**
-     * Handles the logic for marking a task as incomplete.
+     * Marks a task as incomplete
      * * @param index The 1-based index of the task in the list.
      * @return A confirmation message from the UI.
      * @throws AtlasException If the index is invalid.
