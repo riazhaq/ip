@@ -16,9 +16,9 @@ Atlas is a task management application designed to help you organize your daily 
 * **Java 17 or higher** must be installed on your machine.
 
 ### Running the Application
-1. Download the latest `atlas.jar` from the [Releases](https://github.com/riazhaq/ip/releases) page.
-2. Place `atlas.jar` in an empty folder on your computer.
+1. Download the latest `atlas-all.jar` from the [Releases](https://github.com/riazhaq/ip/releases) page.
+2. Place `atlas-all.jar` in an empty folder on your computer.
 3. Open your terminal or command prompt in that folder.
 4. Run the following command:
    ```bash
-   java -jar atlas.jar
+   java -jar atlas-all.jar
