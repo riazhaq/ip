@@ -119,6 +119,6 @@ public class Atlas {
      * @return A welcome string containing the Quick Start guide.
      */
     public String getWelcomeString() {
-        return ui.getWelcomeString();
+        return ui.getWelcomeString(); //Improvement of code quality
     }
 }
