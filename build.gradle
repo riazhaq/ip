@@ -39,7 +39,8 @@ application {
 
 shadowJar {
     archiveBaseName.set("atlas")
-    archiveClassifier.set(null)
+    archiveClassifier.set("all") // Use "all" to be explicit
+    mergeServiceFiles()
     configurations = [project.configurations.runtimeClasspath]
 }
 

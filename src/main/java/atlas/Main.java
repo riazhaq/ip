@@ -5,7 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -15,26 +15,20 @@ import java.io.IOException;
  */
 public class Main extends Application {
 
-    private Atlas atlas = new Atlas();
-
-    /**
-     * Starts the JavaFX application by loading the FXML for the main window,
-     * setting the scene, and injecting the Atlas logic engine into the controller.
-     *
-     * @param stage The primary stage for this application, onto which
-     * the application scene can be set.
-     */
     @Override
     public void start(Stage stage) {
         try {
+            String baseDir = System.getProperty("atlas.base.dir", System.getProperty("user.dir"));
+            String storagePath = baseDir + File.separator + "data" + File.separator + "tasks.txt";
+
             FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
             AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
             stage.setScene(scene);
             stage.setTitle("Atlas Task Navigator");
 
-            // Inject the Atlas instance into the controller
-            fxmlLoader.<MainWindow>getController().setAtlas(new Atlas());
+            Atlas atlas = new Atlas(storagePath);
+            fxmlLoader.<MainWindow>getController().setAtlas(atlas);
 
             stage.show();
         } catch (IOException e) {

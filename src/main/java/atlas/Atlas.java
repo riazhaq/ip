@@ -15,16 +15,20 @@ public class Atlas {
      * Initializes a new Atlas instance.
      * Sets up the UI, storage path, and attempts to load existing tasks from the data file.
      */
-    public Atlas() {
-        ui = new Ui();
-        storage = new Storage("data/atlas.txt");
-        tasks = new TaskList();
+    // Main constructor
+    public Atlas(String filePath) {
+        this.ui = new Ui();
+        this.storage = new Storage(filePath);
+        this.tasks = new TaskList();
         try {
-            // Load existing tasks on startup
-            tasks.setTasks(storage.load());
+            this.tasks.setTasks(storage.load());
         } catch (IOException e) {
-            // Fallback to empty list if loading fails
         }
+    }
+
+    // Default constructor (chains to the main constructor)
+    public Atlas() {
+        this("data/atlas.txt");
     }
 
     /**
